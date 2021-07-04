@@ -10,20 +10,20 @@ from sklearn.metrics import confusion_matrix, roc_curve, auc
 from sklearn.model_selection import train_test_split
 from keras.utils import np_utils
 
-##設定輸入影像大小
+##set input image size
 input_shape = (416,416,3)
 IMAGE_SIZE = 416
-#按照指定影象大小調整尺寸
+#resize
 def resize_image(image, height = IMAGE_SIZE, width = IMAGE_SIZE):
     top, bottom, left, right = (0, 0, 0, 0)
     
-    #獲取影象尺寸
+    #get size
     h, w, _ = image.shape
     
-    #對於長寬不相等的圖片，找到最長的一邊
+    #adj(w,h)
     longest_edge = max(h, w)    
     
-    #計算短邊需要增加多上畫素寬度使其與長邊等長
+    #size = n*n 
     if h < longest_edge:
         dh = longest_edge - h
         top = dh // 2
@@ -34,17 +34,12 @@ def resize_image(image, height = IMAGE_SIZE, width = IMAGE_SIZE):
         right = dw - left
     else:
         pass 
-    
-    #RGB顏色
-    BLACK = [0, 0, 0]
-    
-    #給影象增加邊界，是圖片長、寬等長，cv2.BORDER_CONSTANT指定邊界顏色由value指定
+
+    BLACK = [0, 0, 0]   
     constant = cv2.copyMakeBorder(image, top , bottom, left, right, cv2.BORDER_CONSTANT, value = BLACK)
-    
-    #調整影象大小並返回
     return cv2.resize(constant, (height, width))
 
-#讀取訓練資料
+#load_data
 jw_face = "F:\\ML\\BO\\A\\"
 #fall1 = "C:\\Users\\User.DESKTOP-IIINHE5\\Desktop\\fall1_img"
 Li_face = "F:\\ML\\BO\\B\\"
@@ -166,7 +161,7 @@ predict_y = model.predict(x_test_std)
 
 
 
-#混淆矩陣
+#confusion_matrix
 predict_y[predict_y >= 0.5] = 1
 predict_y[predict_y < 0.5] = 0
 print(confusion_matrix(y_testOneHot.argmax(axis=1), predict_y.argmax(axis=1), labels=[1, 0]))
@@ -208,32 +203,18 @@ def plt_auc(y_test_label,predict_y):
 plt_auc(y,predict_y.argmax(axis=1))
 
 def plot_image(image,labels,prediction,idx,num=10):  
-
     fig = plt.gcf() 
-
     fig.set_size_inches(12, 14) 
-
     if num>25: 
-
         num=25 
-
     for i in range(0, num): 
-
         ax = plt.subplot(5,5, 1+i) 
-
         ax.imshow(image[idx], cmap='binary') 
-
         title = "label=" +str(labels[idx]) 
-
         if len(prediction)>0: 
-
             title+=",perdict="+str(prediction[idx]) 
-
         ax.set_title(title,fontsize=10) 
-
         ax.set_xticks([]);ax.set_yticks([]) 
-
         idx+=1 
-
     plt.show() 
 plot_image(x_test_std,y_test_label,predict_y.argmax(axis=1),idx=10)
