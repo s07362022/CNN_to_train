@@ -3,7 +3,7 @@
 
 if hight and weight are least then what we set shape, we add black ground to over (set_xshape - img_xshape).
 
-![resize_image](https://ibb.co/74LHnz7)
+![resize_image](https://i.imgur.com/1Z2xV7C.png)
 
 ```python
 def resize_image(image, height = IMAGE_SIZE, width = IMAGE_SIZE):
@@ -67,7 +67,7 @@ model = Model(inputs=base_model.input, outputs=predictions)
 we have to know if the model could efficient by search.
 so, we use ROC curve to look easily.
 
-![ROC curve](https://ibb.co/DR6rPJ5)
+![ROC curve](https://i.imgur.com/p76Y53I.png)
 
 ```python
 def plt_auc(y_test_label,predict_y):
@@ -100,4 +100,4 @@ specificity = TN/(TN+FP)
 
 ######Plot confusion_matrix
 
-![confusion matrix](https://ibb.co/hBDZgX5)
+![confusion matrix](https://i.imgur.com/WVezbeD.png)
