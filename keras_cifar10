@@ -1,0 +1,107 @@
+import keras
+from keras.datasets import cifar10
+from keras.preprocessing.image import ImageDataGenerator
+from keras.models import Sequential
+from keras.layers import Dense, Dropout, Activation, Flatten
+from keras.layers import Conv2D, MaxPooling2D
+import pandas as pd 
+import numpy as np
+(x_train,y_train),(x_test,y_test1) = cifar10.load_data()
+print(x_train.shape,y_train.shape)
+print(x_test.shape,y_test1.shape)
+import matplotlib.pyplot as plt
+
+y_train = y_train.reshape(y_train.shape[0])
+y_test = y_test1.reshape(y_test1.shape[0])
+print(x_train.shape,y_train.shape)
+print(x_test.shape,y_test.shape)
+
+x_train = x_train.astype('float32')
+x_test = x_test.astype('float32')
+x_train /= 255
+x_test /= 255
+y_train = keras.utils.to_categorical(y_train, 10)
+y_test = keras.utils.to_categorical(y_test, 10)
+
+print(x_train.shape,y_train.shape)
+print(x_test.shape,y_test.shape)
+
+model = Sequential()
+
+model.add(Conv2D(filters=32,kernel_size=(3,3),
+                 input_shape=(32, 32,3), 
+                 activation='relu', 
+                 padding='same'))
+model.add(Dropout(rate=0.25))
+model.add(MaxPooling2D(pool_size=(2, 2))) # 16* 16y_test
+
+model.add(Conv2D(filters=64, kernel_size=(3, 3), 
+                 activation='relu', padding='same'))
+model.add(Dropout(0.25))
+model.add(MaxPooling2D(pool_size=(2, 2))) # 8 * 8
+
+model.add(Flatten()) # FC1,64个8*8转化为1维向量
+model.add(Dropout(rate=0.25))
+model.add(Dense(1024, activation='relu')) # FC2 1024
+model.add(Dropout(rate=0.25))
+model.add(Dense(10, activation='softmax')) # Output 10
+
+model.summary()
+
+opt = keras.optimizers.rmsprop(lr=0.0001,decay=1e-6)
+
+model.compile(loss='categorical_crossentropy',
+             optimizer=opt,
+             metrics=['accuracy'])
+
+datagen = ImageDataGenerator(
+    rotation_range = 20,
+    zoom_range = 0.15,
+    horizontal_flip = True,
+)
+
+train_history=model.fit(x=x_train,y=y_train,validation_split=0.3,epochs=100,batch_size=100,verbose=1)
+
+#model.save('cifar10_trained_model.h5')
+
+
+
+import matplotlib.pyplot as plt 
+
+
+#print(x_img_train.shape,x_img_train[0][0][0])
+def show_train_history(train_history,train,Validation):
+    plt.plot(train_history.history[train])
+    plt.plot(train_history.history[Validation])
+    plt.title('Train_history')
+    plt.ylabel(train)
+    plt.xlabel('Epoch')
+    plt.legend(['train','validation'],loc = 'upper left')
+    plt.show()
+
+
+
+scores = model.evaluate(x_test,y_test,verbose=0)
+#model.save("cifarCnnModel.h5")
+#print("Save mode to disk")
+prediction= model.predict_classes(x_test)
+print("scores",scores[1])
+show_train_history(train_history,'loss','val_loss')
+def plot_image(image,labels,prediction,idx,num=10): 
+    fig = plt.gcf()
+    fig.set_size_inches(12, 14)
+    if num>25:
+        num=25
+    for i in range(0, num):
+        ax = plt.subplot(5,5, 1+i)
+        ax.imshow(image[idx], cmap='binary')
+        title = "label=" +str(labels[idx])
+        if len(prediction)>0:
+            title+=",perdict="+str(prediction[idx])
+        ax.set_title(title,fontsize=10)
+        ax.set_xticks([]);ax.set_yticks([])
+        idx+=1
+    plt.show()
+plot_image(x_test,y_test1,prediction,idx=5)
+p =confusion_amtrix =pd.crosstab(np.array(y_test1),prediction, rownames=['label'],colnames=['perdict'],margins = True)
+print(p)
