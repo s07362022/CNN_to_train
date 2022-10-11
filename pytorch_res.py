@@ -246,7 +246,7 @@ BATCH_SIZE = 16
 DOWNLOAD_MNIST = False
 
 #model = models.densenet161(num_classes=2)
-model =  resnet18()
+model =  resnet18(num_classe=300)
 cnn = model
 def train(model,n_epochs,train_loader,valid_loader,optimizer,criterion):#,scheduler
     train_acc_his,valid_acc_his=[],[]
